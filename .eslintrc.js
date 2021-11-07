@@ -1,6 +1,5 @@
 module.exports = {
   root: true,
-  parser: "@typescript-eslint/parser",
   env: {
     browser: true,
     es2021: true,
@@ -8,7 +7,6 @@ module.exports = {
   },
   extends: [
     "eslint:recommended",
-    "plugin:@typescript-eslint/recommended",
     "plugin:react/recommended",
     "plugin:prettier/recommended",
   ],
@@ -19,7 +17,7 @@ module.exports = {
     ecmaVersion: 12,
     sourceType: "module",
   },
-  plugins: ["react", "@typescript-eslint"],
+  plugins: ["react"],
   rules: {
     "react/react-in-jsx-scope": "off",
   },
