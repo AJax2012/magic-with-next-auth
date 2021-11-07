@@ -6,20 +6,21 @@ import { useEffect } from "react";
 export default function Login() {
   const { query } = useRouter();
 
+  /**
+   * stores callback url from query provided by NextAuth
+   * this will be used to redirect user to previous page
+   */
   useEffect(() => {
     if (query) {
-      setCallbackUrl();
+      axios.post("/api/auth/callback", {
+        callbackUrl: query.callbackUrl,
+      });
     }
   }, [query]);
 
-  const setCallbackUrl = async () => {
-    await axios.post("/api/auth/callback", {
-      callbackUrl: query.callbackUrl,
-    });
-  };
-
   return (
     <>
+      {/* Magic login form - https://magic.link/docs/login-form */}
       <script
         src="https://auth.magic.link/pnp/login"
         data-magic-publishable-api-key={

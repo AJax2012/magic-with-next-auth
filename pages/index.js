@@ -49,4 +49,5 @@ export default function Home() {
   );
 }
 
+// Requires user to be logged in
 Home.auth = true;
