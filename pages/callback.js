@@ -23,7 +23,7 @@ export default function Callback() {
 
     await signIn("credentials", {
       didToken,
-      callbackUrl: data.callbackUrl,
+      callbackUrl: data?.callbackUrl ?? null,
     });
   };
 
