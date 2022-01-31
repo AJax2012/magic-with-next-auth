@@ -6,52 +6,61 @@ const magic = new Magic(process.env.MAGIC_SECRET_KEY);
 
 /**
  * NextAuth setup
- * This setup currently requires req,res for NextAuth 4.x - hopefully will change soon
- * NextuAuth 3.x does not require req,res parameters.
  */
-export default async function auth(req, res) {
-  return await NextAuth(req, res, {
-    session: {
-      /**
-       * creates JWT signed by NextAuth
-       * For self-signed jwt, see:
-       * https://next-auth.js.org/configuration/options#jwt
-       */
-      jwt: true,
-    },
-    pages: {
-      /**
-       * default signIn page is /auth/login
-       * we want to use magic for authentication, so override signIn
-       * https://next-auth.js.org/configuration/pages
-       */
-      signIn: "/login",
-    },
-    providers: [
-      /**
-       * allows for manual configuration to get user/session
-       * https://next-auth.js.org/configuration/providers/credentials-provider
-       */
-      CredentialsProvider({
-        name: "Magic Link",
-        credentials: {
-          didToken: { label: "DID Token", type: "text" },
-        },
-        async authorize({ didToken }) {
-          magic.token.validate(didToken);
-          const metadata = await magic.users.getMetadataByToken(didToken);
+export default NextAuth({
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    /**
+     * Idle session expires in 30 days
+     */
+    maxAge: 30 * 24 * 60 * 60,
+    /**
+     * extends the session every 24 hours when session not idle
+     */
+    updateAge: 24 * 60 * 60,
+  },
+  jwt: {
+    /**
+     * gets secret for encoding/decoding JWT
+     */
+    secret: process.env.JWT_KEY,
+    /**
+     * sets max age of JWT to 30 days (exp property)
+     */
+    maxAge: 60 * 60 * 24 * 30,
+  },
+  pages: {
+    /**
+     * default signIn page is /auth/login
+     * we want to use magic for authentication, so override signIn
+     * https://next-auth.js.org/configuration/pages
+     */
+    signIn: "/login",
+  },
+  providers: [
+    /**
+     * allows for manual configuration to get user/session
+     * https://next-auth.js.org/configuration/providers/credentials-provider
+     */
+    CredentialsProvider({
+      name: "Magic Link",
+      credentials: {
+        didToken: { label: "DID Token", type: "text" },
+      },
+      async authorize({ didToken }) {
+        magic.token.validate(didToken);
+        const metadata = await magic.users.getMetadataByToken(didToken);
 
-          /**
-           * returns NextAuth user:
-           * https://next-auth.js.org/adapters/models
-           */
-          return {
-            email: metadata.email,
-            name: metadata.email,
-            email_verified: true,
-          };
-        },
-      }),
-    ],
-  });
-}
+        /**
+         * returns NextAuth user:
+         * https://next-auth.js.org/adapters/models
+         */
+        return {
+          email: metadata.email,
+          name: metadata.email,
+          email_verified: true,
+        };
+      },
+    }),
+  ],
+});
