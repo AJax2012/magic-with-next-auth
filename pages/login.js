@@ -2,6 +2,7 @@ import axios from "axios";
 import { getSession } from "next-auth/react";
 import { useRouter } from "next/dist/client/router";
 import { useEffect } from "react";
+import Script from "next/script";
 
 export default function Login() {
   const { query } = useRouter();
@@ -21,13 +22,14 @@ export default function Login() {
   return (
     <>
       {/* Magic login form - https://magic.link/docs/login-form */}
-      <script
+      <Script
+        strategy="lazyOnload"
         src="https://auth.magic.link/pnp/login"
         data-magic-publishable-api-key={
           process.env.NEXT_PUBLIC_MAGIC_PUBLISHABLE_KEY
         }
         data-redirect-uri="/callback"
-      ></script>
+      ></Script>
     </>
   );
 }
